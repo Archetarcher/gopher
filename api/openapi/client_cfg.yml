@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=../../../configuration-schema.json
+package: api
+output: internal/client/api/http_api.gen.go
+generate:
+  models: true
+  chi-server: true
+  embedded-spec: true
+  client: true

@@ -1,0 +1,257 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Gophkeeper auth
+servers:
+  - url: https://{hostname}/api
+    variables:
+      hostname:
+        default: localhost
+security:
+  - BearerAuth: [ ]
+paths:
+  /cipher-login/remember:
+    post:
+      operationId: rememberCipherLogin
+      requestBody:
+        description: remembers login an pass
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberCipherLogin'
+      responses:
+        '201':
+          description: todo
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cipher-custom/remember:
+    post:
+      operationId: rememberCipherCustom
+      requestBody:
+        description: remembers custom data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberCipherCustom'
+      responses:
+        '204':
+          description: todo
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cipher-custom-binary/remember:
+    post:
+      operationId: rememberCipherCustomBinary
+      requestBody:
+        description: remembers custom binary data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberCipherCustomBinary'
+      responses:
+        '204':
+          description: todo
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cipher-card/remember:
+    post:
+      operationId: rememberCipherCard
+      requestBody:
+        description: remembers card data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberCipherCard'
+      responses:
+        '204':
+          description: todo
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/sign-up:
+    post:
+      operationId: signUp
+      security: []
+      requestBody:
+        description: todo
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUp'
+      responses:
+        '204':
+          description: auth created
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /users/sign-in:
+    post:
+      operationId: signIn
+      security: []
+      requestBody:
+        description: todo
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignIn'
+      responses:
+        '200':
+          description: authorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    RememberCipherCard:
+      type: object
+      required:
+        - cardHolderName
+        - brand
+        - number
+        - expMonth
+        - expYear
+        - code
+      properties:
+        cardHolderName:
+          type: string
+        brand:
+          type: string
+        number:
+          type: string
+        expMonth:
+          type: string
+        expYear:
+          type: string
+        code:
+          type: string
+        meta:
+          type: string
+    RememberCipherCustomBinary:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        meta:
+          type: string
+    RememberCipherCustom:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        meta:
+          type: string
+    RememberCipherLogin:
+      type: object
+      required:
+        - login
+        - password
+        - uri
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        uri:
+          type: string
+    SignIn:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+    SignUp:
+      type: object
+      required:
+        - login
+        - password
+        - firstname
+        - lastname
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+    User:
+      type: object
+      required:
+        - firstname
+        - lastname
+      properties:
+        firstname:
+          type: string
+        lastname:
+          type: integer
+    Token:
+      type: object
+      required:
+        - token
+        - expires_at
+      properties:
+        token:
+          type: string
+        expires_at:
+          type: string
+    Error:
+      type: object
+      required:
+        - slug
+        - message
+      properties:
+        slug:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

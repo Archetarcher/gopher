@@ -1,0 +1,262 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: Gophkeeper vault
+servers:
+  - url: https://{hostname}/api
+    variables:
+      hostname:
+        default: localhost
+security:
+  - BearerAuth: [ ]
+paths:
+  /login-data/remember :
+    post:
+      operationId: rememberCipherLoginData
+      requestBody:
+        description: remembers auth's login password
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberCipherLoginData'
+      responses:
+        '204':
+          description: todo
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /custom-data/remember :
+    post:
+      operationId: rememberCipherCustomData
+      requestBody:
+        description: remembers custom data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberCipherCustomData'
+      responses:
+        '204':
+          description: todo
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /custom-binary-data/remember :
+    post:
+      operationId: rememberCipherCustomBinaryData
+      requestBody:
+        description: remembers custom binary data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberCipherCustomBinaryData'
+      responses:
+        '204':
+          description: todo
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /card-data/remember :
+    post:
+      operationId: rememberCipherCardData
+      requestBody:
+        description: remembers card data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RememberCipherCardData'
+      responses:
+        '204':
+          description: todo
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /secrets :
+    get:
+      operationId: showUserSecrets
+      responses:
+        '200':
+          description: todo
+          content:
+            application/json:
+              schema:
+                $ref:
+                  '#/components/schemas/Secrets'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /secret :
+    get:
+      operationId: showSecret
+      requestBody:
+        description: todo
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShowSecret'
+      responses:
+        '200':
+          description: todo
+          content:
+            application/json:
+              schema:
+                $ref:
+                  '#/components/schemas/Secret'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    StartSession:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+    RememberCipherCardData:
+      type: object
+      required:
+        - cardHolderName
+        - brand
+        - number
+        - expMonth
+        - expYear
+        - code
+      properties:
+        cardHolderName:
+          type: string
+        brand:
+          type: string
+        number:
+          type: string
+        expMonth:
+          type: string
+        expYear:
+          type: string
+        code:
+          type: string
+        meta:
+          type: string
+    RememberCipherCustomBinaryData:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        meta:
+          type: string
+    RememberCipherCustomData:
+      type: object
+      required:
+        - key
+        - value
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        meta:
+          type: string
+    RememberCipherLoginData:
+      type: object
+      required:
+        - uri
+        - login
+        - password
+      properties:
+        uri:
+          type: string
+        login:
+          type: string
+        password:
+          type: string
+        meta:
+          type: string
+    Secret:
+      type: object
+      required: [ uuid, key, data, type]
+      properties:
+        uuid:
+          type: string
+          format: uuid
+        key:
+          type: string
+          example: key_for_some_pass
+        data:
+          type: string
+          example: some_pass
+        type:
+          type: string
+          example: "auth"
+    Secrets:
+      type: object
+      required: [ secrets ]
+      properties:
+        secrets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Secret'
+
+    ShowSecret:
+      type: object
+      required:
+        - key
+      properties:
+        key:
+          type: string
+    RememberSecret:
+      type: object
+      required:
+        - key
+        - data
+        - type
+      properties:
+        key:
+          type: string
+        data:
+          type: string
+        type:
+          type: string
+    Error:
+      type: object
+      required:
+        - slug
+        - message
+      properties:
+        slug:
+          type: string
+        message:
+          type: string
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
