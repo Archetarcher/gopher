@@ -3,7 +3,7 @@ package memory
 import (
 	"context"
 	"errors"
-	"github.com/Archetarcher/gophkeeper/internal/server/domain/user"
+	"github.com/Archetarcher/gophkeeper/internal/auth/domain/user"
 	"github.com/google/uuid"
 	"testing"
 )
@@ -29,7 +29,7 @@ func TestRepository_Get(t *testing.T) {
 		{
 			name: "#1 [positive test]: auth by login",
 			fields: fields{users: map[uuid.UUID]user.User{
-				id: u,
+				id: *u,
 			}},
 			args:        args{id: id},
 			expectedErr: nil,
@@ -37,7 +37,7 @@ func TestRepository_Get(t *testing.T) {
 		{
 			name: "#2 [negative test]: no auth by login",
 			fields: fields{users: map[uuid.UUID]user.User{
-				id: u,
+				id: *u,
 			}},
 			args:        args{id: uuid.MustParse("f47ac10b-58cc-0372-8567-0e02b2c3d479")},
 			expectedErr: user.ErrUserNotFound,
@@ -126,7 +126,7 @@ func TestRepository_GetByLogin(t *testing.T) {
 		{
 			name: "#1 [positive test]: auth by login",
 			fields: fields{users: map[uuid.UUID]user.User{
-				id: u,
+				id: *u,
 			}},
 			args:        args{login: login},
 			expectedErr: nil,
@@ -134,7 +134,7 @@ func TestRepository_GetByLogin(t *testing.T) {
 		{
 			name: "#2 [negative test]: no auth by login",
 			fields: fields{users: map[uuid.UUID]user.User{
-				id: u,
+				id: *u,
 			}},
 			args:        args{login: "incorrectLogin"},
 			expectedErr: user.ErrUserNotFound,
