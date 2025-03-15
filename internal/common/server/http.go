@@ -1,22 +1,18 @@
 package server
 
 import (
-	b64 "encoding/base64"
-	"fmt"
-	"github.com/Archetarcher/gophkeeper/internal/common/auth"
-	"github.com/Archetarcher/gophkeeper/internal/common/encryption"
-	"github.com/Archetarcher/gophkeeper/internal/common/server/httperr"
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/jwtauth/v5"
-	"github.com/go-chi/render"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/sirupsen/logrus"
 	"net/http"
-	"os"
 )
+
+type MiddlewareFunc func(handler http.Handler) http.Handler
 
 func RunHTTPServerOnAddr(addr string, handler func(router chi.Router) http.Handler) {
 	apiRouter := chi.NewRouter()
 	rootRouter := chi.NewRouter()
+	rootRouter.Use(middleware.DefaultLogger)
 
 	// we are mounting all APIs under /api path
 	rootRouter.Mount("/api", handler(apiRouter))
@@ -29,16 +25,10 @@ func RunHTTPServerOnAddr(addr string, handler func(router chi.Router) http.Handl
 
 }
 
-func RunHTTPServerOnAddrWithMiddlewares(addr string, handler func(router chi.Router) http.Handler, serverConfig *Config, tokenCfg auth.JWTTokenConfig) {
+func RunHTTPServerOnAddrWithMiddlewares(addr string, handler func(router chi.Router) http.Handler, rootRouter chi.Router, middlewares ...MiddlewareFunc) {
 	// config middlewares only for api routes
 	// we are mounting all APIs under /api path
-	rootRouter := chi.NewRouter()
-	rootRouter.Use(jwtauth.Verifier(tokenCfg.GetAuthToken()))
-	rootRouter.Use(jwtauth.Authenticator(tokenCfg.GetAuthToken()))
-
-	rootRouter.Post("/session", serverConfig.handleStartSession)
-
-	rootRouter.Mount("/api", apiRouter(handler, serverConfig))
+	rootRouter.Mount("/api", apiRouterWithMiddlewares(handler, middlewares))
 	logrus.Info("Starting HTTP server", addr)
 	err := http.ListenAndServe(addr, rootRouter)
 	if err != nil {
@@ -46,43 +36,11 @@ func RunHTTPServerOnAddrWithMiddlewares(addr string, handler func(router chi.Rou
 	}
 
 }
-func apiRouter(handler func(router chi.Router) http.Handler, serverConfig *Config) http.Handler {
+func apiRouterWithMiddlewares(handler func(router chi.Router) http.Handler, middlewares []MiddlewareFunc) http.Handler {
 	router := chi.NewRouter()
-	//router.Use(GzipMiddleware)
-	//router.Use(func(handler http.Handler) http.Handler {
-	//	enc := encryption.NewSymmetric(serverConfig.Session.Key)
-	//	return RequestDecryptMiddleware(handler, enc)
-	//})
+
+	for _, m := range middlewares {
+		router.Use(m)
+	}
 	return handler(router)
-}
-
-func (c *Config) handleStartSession(writer http.ResponseWriter, request *http.Request) {
-	fmt.Println("start session request")
-	startSession := StartSession{}
-	if err := render.Decode(request, &startSession); err != nil {
-		httperr.BadRequest("invalid-request", err, writer, request)
-		return
-	}
-	_, err := auth.GetIDFromToken(request.Context())
-	if err != nil {
-		httperr.RespondWithSlugError(err, writer, request)
-		return
-	}
-	sDec, err := b64.StdEncoding.DecodeString(startSession.Key)
-	if err != nil {
-		httperr.RespondWithSlugError(err, writer, request)
-		return
-	}
-	key, err := encryption.NewAsymmetric(os.Getenv("PUBLIC_KEY_PATH"), os.Getenv("PRIVATE_KEY_PATH")).Decrypt(sDec)
-	if err != nil {
-		httperr.RespondWithSlugError(err, writer, request)
-		return
-	}
-	c.Session.Key = string(key)
-	writer.WriteHeader(http.StatusOK)
-}
-
-// StartSession defines model for StartSession.
-type StartSession struct {
-	Key string `json:"key"`
 }

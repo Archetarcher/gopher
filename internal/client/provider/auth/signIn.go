@@ -32,3 +32,6 @@ func NewSignIn(login, password string) (*SignIn, error) {
 func (u *SignIn) GetLogin() string {
 	return u.login
 }
+func (u *SignIn) GetPassword() string {
+	return u.password
+}

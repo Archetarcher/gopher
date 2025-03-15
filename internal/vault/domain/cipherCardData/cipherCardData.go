@@ -27,7 +27,7 @@ type CipherCardData struct {
 // It will validate that the cardHolderName, brand, number, expMonth, expYear, code are not empty
 func NewCipherCardData(cardHolderName, brand, number, expMonth, expYear, code, meta []byte, userId uuid.UUID) (*CipherCardData, error) {
 	if len(cardHolderName) == 0 {
-		return nil, errors.Wrap(ErrInvalidCipherCardData, "cardHolderName does not provided")
+		return nil, errors.Wrap(ErrInvalidCipherCardData, "card holder name does not provided")
 	}
 	if len(brand) == 0 {
 		return nil, errors.Wrap(ErrInvalidCipherCardData, "brand does not provided")
@@ -36,10 +36,10 @@ func NewCipherCardData(cardHolderName, brand, number, expMonth, expYear, code, m
 		return nil, errors.Wrap(ErrInvalidCipherCardData, "number does not provided")
 	}
 	if len(expMonth) == 0 {
-		return nil, errors.Wrap(ErrInvalidCipherCardData, "expMonth does not provided")
+		return nil, errors.Wrap(ErrInvalidCipherCardData, "expiration month does not provided")
 	}
 	if len(expYear) == 0 {
-		return nil, errors.Wrap(ErrInvalidCipherCardData, "expYear does not provided")
+		return nil, errors.Wrap(ErrInvalidCipherCardData, "expiration year does not provided")
 	}
 	if len(code) == 0 {
 		return nil, errors.Wrap(ErrInvalidCipherCardData, "code does not provided")

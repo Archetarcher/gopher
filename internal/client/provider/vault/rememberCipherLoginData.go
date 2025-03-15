@@ -46,3 +46,6 @@ func (u *RememberCipherLoginData) GetLogin() string {
 func (u *RememberCipherLoginData) GetPassword() string {
 	return u.password
 }
+func (u *RememberCipherLoginData) GetMeta() string {
+	return u.meta
+}

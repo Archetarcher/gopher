@@ -29,19 +29,19 @@ func (s *Symmetric) Decrypt(ciphertext []byte) ([]byte, error) {
 	block, err := aes.NewCipher([]byte(s.key))
 	if err != nil {
 
-		logrus.Error("error symmetric decryption", err)
+		logrus.Error("error symmetric decryption ", err)
 		return nil, errors.Wrap(err, "error decryption")
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		logrus.Error("error symmetric decryption", err)
+		logrus.Error("error symmetric decryption ", err)
 		return nil, errors.Wrap(err, "error decryption")
 	}
 
 	plaintext, err := gcm.Open(nil, ciphertext[len(ciphertext)-12:], ciphertext[:len(ciphertext)-12], nil)
 	if err != nil {
-		logrus.Error("error symmetric decryption", err)
+		logrus.Error("error symmetric decryption ", err)
 		return nil, errors.Wrap(err, "error decryption")
 	}
 
@@ -50,19 +50,19 @@ func (s *Symmetric) Decrypt(ciphertext []byte) ([]byte, error) {
 func (s *Symmetric) Encrypt(plaintext []byte) ([]byte, error) {
 	block, err := aes.NewCipher([]byte(s.key))
 	if err != nil {
-		logrus.Error("error symmetric encryption", err)
+		logrus.Error("error symmetric encryption ", err)
 		return nil, errors.Wrap(err, "error encryption")
 	}
 
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		logrus.Error("error symmetric encryption", err)
+		logrus.Error("error symmetric encryption ", err)
 		return nil, errors.Wrap(err, "error encryption")
 	}
 
 	nonce := make([]byte, 12)
 	if _, err := rand.Read(nonce); err != nil {
-		logrus.Error("error symmetric encryption", err)
+		logrus.Error("error symmetric encryption ", err)
 		return nil, errors.Wrap(err, "error encryption")
 	}
 

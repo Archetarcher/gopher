@@ -32,27 +32,24 @@ type Error struct {
 
 // RememberCipherCard defines model for RememberCipherCard.
 type RememberCipherCard struct {
-	Brand          string  `json:"brand"`
-	CardHolderName string  `json:"cardHolderName"`
-	Code           string  `json:"code"`
-	ExpMonth       string  `json:"expMonth"`
-	ExpYear        string  `json:"expYear"`
-	Meta           *string `json:"meta,omitempty"`
-	Number         string  `json:"number"`
+	Brand           string `json:"brand"`
+	CardHolderName  string `json:"cardHolderName"`
+	Code            string `json:"code"`
+	ExpirationMonth string `json:"expirationMonth"`
+	ExpirationYear  string `json:"expirationYear"`
+	Number          string `json:"number"`
 }
 
 // RememberCipherCustom defines model for RememberCipherCustom.
 type RememberCipherCustom struct {
-	Key   string  `json:"key"`
-	Meta  *string `json:"meta,omitempty"`
-	Value string  `json:"value"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 // RememberCipherCustomBinary defines model for RememberCipherCustomBinary.
 type RememberCipherCustomBinary struct {
-	Key   string  `json:"key"`
-	Meta  *string `json:"meta,omitempty"`
-	Value string  `json:"value"`
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 // RememberCipherLogin defines model for RememberCipherLogin.
@@ -60,26 +57,6 @@ type RememberCipherLogin struct {
 	Login    string `json:"login"`
 	Password string `json:"password"`
 	Uri      string `json:"uri"`
-}
-
-// SignIn defines model for SignIn.
-type SignIn struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
-}
-
-// SignUp defines model for SignUp.
-type SignUp struct {
-	Firstname string `json:"firstname"`
-	Lastname  string `json:"lastname"`
-	Login     string `json:"login"`
-	Password  string `json:"password"`
-}
-
-// Token defines model for Token.
-type Token struct {
-	ExpiresAt string `json:"expires_at"`
-	Token     string `json:"token"`
 }
 
 // RememberCipherCardJSONRequestBody defines body for RememberCipherCard for application/json ContentType.
@@ -93,12 +70,6 @@ type RememberCipherCustomJSONRequestBody = RememberCipherCustom
 
 // RememberCipherLoginJSONRequestBody defines body for RememberCipherLogin for application/json ContentType.
 type RememberCipherLoginJSONRequestBody = RememberCipherLogin
-
-// SignInJSONRequestBody defines body for SignIn for application/json ContentType.
-type SignInJSONRequestBody = SignIn
-
-// SignUpJSONRequestBody defines body for SignUp for application/json ContentType.
-type SignUpJSONRequestBody = SignUp
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -192,16 +163,6 @@ type ClientInterface interface {
 	RememberCipherLoginWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	RememberCipherLogin(ctx context.Context, body RememberCipherLoginJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// SignInWithBody request with any body
-	SignInWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	SignIn(ctx context.Context, body SignInJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	// SignUpWithBody request with any body
-	SignUpWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
-
-	SignUp(ctx context.Context, body SignUpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) RememberCipherCardWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -290,54 +251,6 @@ func (c *Client) RememberCipherLoginWithBody(ctx context.Context, contentType st
 
 func (c *Client) RememberCipherLogin(ctx context.Context, body RememberCipherLoginJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRememberCipherLoginRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) SignInWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSignInRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) SignIn(ctx context.Context, body SignInJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSignInRequest(c.Server, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) SignUpWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSignUpRequestWithBody(c.Server, contentType, body)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
-func (c *Client) SignUp(ctx context.Context, body SignUpJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSignUpRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -508,86 +421,6 @@ func NewRememberCipherLoginRequestWithBody(server string, contentType string, bo
 	return req, nil
 }
 
-// NewSignInRequest calls the generic SignIn builder with application/json body
-func NewSignInRequest(server string, body SignInJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewSignInRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewSignInRequestWithBody generates requests for SignIn with any type of body
-func NewSignInRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/users/sign-in")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
-// NewSignUpRequest calls the generic SignUp builder with application/json body
-func NewSignUpRequest(server string, body SignUpJSONRequestBody) (*http.Request, error) {
-	var bodyReader io.Reader
-	buf, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	bodyReader = bytes.NewReader(buf)
-	return NewSignUpRequestWithBody(server, "application/json", bodyReader)
-}
-
-// NewSignUpRequestWithBody generates requests for SignUp with any type of body
-func NewSignUpRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/users/sign-up")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", queryURL.String(), body)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", contentType)
-
-	return req, nil
-}
-
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -650,16 +483,6 @@ type ClientWithResponsesInterface interface {
 	RememberCipherLoginWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RememberCipherLoginResponse, error)
 
 	RememberCipherLoginWithResponse(ctx context.Context, body RememberCipherLoginJSONRequestBody, reqEditors ...RequestEditorFn) (*RememberCipherLoginResponse, error)
-
-	// SignInWithBodyWithResponse request with any body
-	SignInWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SignInResponse, error)
-
-	SignInWithResponse(ctx context.Context, body SignInJSONRequestBody, reqEditors ...RequestEditorFn) (*SignInResponse, error)
-
-	// SignUpWithBodyWithResponse request with any body
-	SignUpWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SignUpResponse, error)
-
-	SignUpWithResponse(ctx context.Context, body SignUpJSONRequestBody, reqEditors ...RequestEditorFn) (*SignUpResponse, error)
 }
 
 type RememberCipherCardResponse struct {
@@ -750,51 +573,6 @@ func (r RememberCipherLoginResponse) StatusCode() int {
 	return 0
 }
 
-type SignInResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *Token
-	JSONDefault  *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r SignInResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r SignInResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
-type SignUpResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSONDefault  *Error
-}
-
-// Status returns HTTPResponse.Status
-func (r SignUpResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r SignUpResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 // RememberCipherCardWithBodyWithResponse request with arbitrary body returning *RememberCipherCardResponse
 func (c *ClientWithResponses) RememberCipherCardWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RememberCipherCardResponse, error) {
 	rsp, err := c.RememberCipherCardWithBody(ctx, contentType, body, reqEditors...)
@@ -861,40 +639,6 @@ func (c *ClientWithResponses) RememberCipherLoginWithResponse(ctx context.Contex
 		return nil, err
 	}
 	return ParseRememberCipherLoginResponse(rsp)
-}
-
-// SignInWithBodyWithResponse request with arbitrary body returning *SignInResponse
-func (c *ClientWithResponses) SignInWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SignInResponse, error) {
-	rsp, err := c.SignInWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseSignInResponse(rsp)
-}
-
-func (c *ClientWithResponses) SignInWithResponse(ctx context.Context, body SignInJSONRequestBody, reqEditors ...RequestEditorFn) (*SignInResponse, error) {
-	rsp, err := c.SignIn(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseSignInResponse(rsp)
-}
-
-// SignUpWithBodyWithResponse request with arbitrary body returning *SignUpResponse
-func (c *ClientWithResponses) SignUpWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SignUpResponse, error) {
-	rsp, err := c.SignUpWithBody(ctx, contentType, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseSignUpResponse(rsp)
-}
-
-func (c *ClientWithResponses) SignUpWithResponse(ctx context.Context, body SignUpJSONRequestBody, reqEditors ...RequestEditorFn) (*SignUpResponse, error) {
-	rsp, err := c.SignUp(ctx, body, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseSignUpResponse(rsp)
 }
 
 // ParseRememberCipherCardResponse parses an HTTP response from a RememberCipherCardWithResponse call
@@ -1001,65 +745,6 @@ func ParseRememberCipherLoginResponse(rsp *http.Response) (*RememberCipherLoginR
 	return response, nil
 }
 
-// ParseSignInResponse parses an HTTP response from a SignInWithResponse call
-func ParseSignInResponse(rsp *http.Response) (*SignInResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &SignInResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest Token
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSON200 = &dest
-
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
-// ParseSignUpResponse parses an HTTP response from a SignUpWithResponse call
-func ParseSignUpResponse(rsp *http.Response) (*SignUpResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &SignUpResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest Error
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
-}
-
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 
@@ -1074,12 +759,6 @@ type ServerInterface interface {
 
 	// (POST /cipher-login/remember)
 	RememberCipherLogin(w http.ResponseWriter, r *http.Request)
-
-	// (POST /users/sign-in)
-	SignIn(w http.ResponseWriter, r *http.Request)
-
-	// (POST /users/sign-up)
-	SignUp(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -1103,16 +782,6 @@ func (_ Unimplemented) RememberCipherCustom(w http.ResponseWriter, r *http.Reque
 
 // (POST /cipher-login/remember)
 func (_ Unimplemented) RememberCipherLogin(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (POST /users/sign-in)
-func (_ Unimplemented) SignIn(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotImplemented)
-}
-
-// (POST /users/sign-up)
-func (_ Unimplemented) SignUp(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1196,34 +865,6 @@ func (siw *ServerInterfaceWrapper) RememberCipherLogin(w http.ResponseWriter, r 
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.RememberCipherLogin(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// SignIn operation middleware
-func (siw *ServerInterfaceWrapper) SignIn(w http.ResponseWriter, r *http.Request) {
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.SignIn(w, r)
-	}))
-
-	for _, middleware := range siw.HandlerMiddlewares {
-		handler = middleware(handler)
-	}
-
-	handler.ServeHTTP(w, r)
-}
-
-// SignUp operation middleware
-func (siw *ServerInterfaceWrapper) SignUp(w http.ResponseWriter, r *http.Request) {
-
-	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		siw.Handler.SignUp(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1358,12 +999,6 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/cipher-login/remember", wrapper.RememberCipherLogin)
 	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/users/sign-in", wrapper.SignIn)
-	})
-	r.Group(func(r chi.Router) {
-		r.Post(options.BaseURL+"/users/sign-up", wrapper.SignUp)
-	})
 
 	return r
 }
@@ -1371,19 +1006,17 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/9yXz1PbOhDH/xWP3jsaHN7rybfC9Acd2kOB6XSYTEexN7HA1qoriZIy/t87kmxiiEhC",
-	"SyjDCaOVVp/dL9pdrlmBjUIJ0miWXzNdVNBw//mGCMl9KEIFZAT45Qa05jNwn2augOVMGxJyxtqU6drO",
-	"IoY2ZQTfrSAoWX4WdqU3jsZpvx8n51AY5+gzNNBMgA6EqoAOOJXLIBPisoxiFJzK91iXQJ94EyctsIwb",
-	"4Ep9RGmq+4xfgVPU1oDhUYO0LpL1ablDnXYB3jgYsC1Iukg2yKHVBpvlLF7A/GHhXPLawvponN9+86Z0",
-	"+0Jymj9XxiOcCbkMV/fLSxSKa/0DKf43akmsBwy+B57CuRjrsZjJw8fCW4dxH8CpWgaYCtJG3vcOa77K",
-	"uA32dEA0uD8W0gleQCSlcKUEgf7GTZTN9KdWg4Vt6dDbMoOrqVBYEmZ+7CpzANgHTkCvbahSE//bW6TG",
-	"AbEPX05YGuq48xSs7MZzZYxirXMs5BQ9pjC1s7xDVV0AKKCEW19kLoG0QMlytrc72h254FCB5EqwnP3v",
-	"l1xiTeWpssI/kx1XxzLqno7PHmqfKZdDbgTKw5LlsRIfEgTa7GPpX3yB0oD0h7lStSj88exco1w0K/f1",
-	"L8GU5eyfbNHNsq6VZZGLfPwl6IKEMiHCHlgnjj8pueFsKJghC15BrVDqoMN/o1fux21HBktk3v2U29o8",
-	"WhihHUfIrYQrBYWBMoF+T5su5PCldWfia+vDdRkW5ifRZ3jhap38ziQE9uIE+02lnlCjjdR5ObL4RvJg",
-	"VY669rN9UcJNKzXxISRcJq4ZbqDK3jNWxWognWkxkzvdVBZVoxuLtiNA5zxC7dO0PsGjR0MJo0qExLVy",
-	"JPETyr8t22KUYfnZ+K6IVq0W8VRtUcRT9QciRmqXS3pSEHDz/NJ+e+H2MHk2bsfOTG7y81ZLdTc06jzL",
-	"risM43KbuSHQ/e9Egk/qkIreGPLRRcxqLHjtTI533P4KAAD//8hsPJlxEAAA",
+	"H4sIAAAAAAAC/9xW32/UMAz+VyrDY7duwFPf2MRPDR4ACaHpHnKtd83WxsFJxk5T/3fkpLe70Wp3QzDQ",
+	"npqLHef7/MX2XUNFnSWDxjsor8FVDXYqLl8xE8vCMllkrzFud+icWqAs/dIilOA8a7OAPgfXhsWEoc+B",
+	"8XvQjDWUp8krvwk0y1f+ND/HykugT9hhN0c+1rZBPlZcj4HMWZl6EkaluH5LbY38UXXTSCuqpw14ZTUr",
+	"r8l8IOObLT7fUPGkiwkCf3sufoGaD6xuAowBja4fyOyQxuA8deNEXuByksOlagNupyDHV867gjjSRvHy",
+	"H0M5oYU2YwztanuEwirnfhBPP7rAejvAFHsjUjo3xirFhFVg7ZefpSQTtCNUjPwypHc5j79eE3fKQwnv",
+	"v36BPBWwREpWuInceG+hl8DanFGEqn0rljdkmwtEi5ypEF/YJbLTZKCEw/2D/QOhRxaNshpKeB63hINv",
+	"Iqqiiunck7dc8JDimFdyXr6S3fhe39VQTtV2ShI6f0R1fAAVGY8mHlbWtrqKx4tzR2bdpWT1lPEMSnhS",
+	"rNtYMfSwYuKiyL9GV7G2PjFcAXaZ4M9q5RVsiuY5YFTRWTIu6fDs4IV8bgfyVBPE8GcqtP6P0Uh9eAJ5",
+	"MHhlsfJYZ7jy6fO1HLHS9uax1O6vy2adPog+mxferVP0zBKxRyfYbyr1gBrtpM7jkSX27HurcjJ0+r8v",
+	"SrrpTk0ihUyZTObODqoc/q+qbIxFKE9vD8TTWT8TM8v0itbA7TD4XFkU1w05b1SHfSGDTP4nsFbzNpFe",
+	"GRPzgSO0VKlWTHL7rP8ZAAD//1PrsSAuCwAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -30,3 +30,14 @@ func NewRememberCipherCustomBinaryData(key, value, meta string) (*RememberCipher
 		meta:  meta,
 	}, nil
 }
+func (c *RememberCipherCustomBinaryData) GetKey() string {
+	return c.key
+}
+
+func (c *RememberCipherCustomBinaryData) GetValue() string {
+	return c.value
+}
+
+func (c *RememberCipherCustomBinaryData) GetMeta() string {
+	return c.meta
+}

@@ -130,13 +130,6 @@ paths:
 
 components:
   schemas:
-    StartSession:
-      type: object
-      required:
-        - key
-      properties:
-        key:
-          type: string
     RememberCipherCardData:
       type: object
       required:

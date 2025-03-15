@@ -1,22 +1,19 @@
 package provider
 
 import (
-	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"
 	"time"
 )
 
 type Config struct {
-	RunAddr string
-	Client  *resty.Client
 	Token   *Token
 	Session *Session
 }
 
 // Token is a struct for obtained jwt token
 type Token struct {
-	Token     string
-	ExpiresAt string
+	Token     string `json:"token"`
+	ExpiresAt string `json:"expires_at"`
 }
 
 func (t *Token) IsExpired() bool {

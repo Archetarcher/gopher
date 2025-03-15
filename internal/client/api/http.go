@@ -25,19 +25,13 @@ func (s HTTPServer) RememberCipherCard(w http.ResponseWriter, r *http.Request) {
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}
-	_, err := auth.GetIDFromToken(r.Context())
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
 	cmd := command.RememberCipherCardData{
 		CardHolderName: rememberCipher.CardHolderName,
 		Brand:          rememberCipher.Brand,
 		Number:         rememberCipher.Number,
-		ExpYear:        rememberCipher.ExpYear,
-		ExpMonth:       rememberCipher.ExpMonth,
+		ExpYear:        rememberCipher.ExpirationYear,
+		ExpMonth:       rememberCipher.ExpirationMonth,
 		Code:           rememberCipher.Code,
-		Meta:           *rememberCipher.Meta,
 	}
 	cErr := s.app.Commands.RememberCipherCardData.Handle(r.Context(), cmd)
 	if cErr != nil {
@@ -53,15 +47,9 @@ func (s HTTPServer) RememberCipherCustomBinary(w http.ResponseWriter, r *http.Re
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}
-	_, err := auth.GetIDFromToken(r.Context())
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
 	cmd := command.RememberCipherCustomBinaryData{
 		Key:   rememberCipher.Key,
 		Value: rememberCipher.Value,
-		Meta:  *rememberCipher.Meta,
 	}
 	cErr := s.app.Commands.RememberCipherCustomBinaryData.Handle(r.Context(), cmd)
 	if cErr != nil {
@@ -77,15 +65,10 @@ func (s HTTPServer) RememberCipherCustom(w http.ResponseWriter, r *http.Request)
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}
-	_, err := auth.GetIDFromToken(r.Context())
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
+
 	cmd := command.RememberCipherCustomData{
 		Key:   rememberCipher.Key,
 		Value: rememberCipher.Value,
-		Meta:  *rememberCipher.Meta,
 	}
 	cErr := s.app.Commands.RememberCipherCustomData.Handle(r.Context(), cmd)
 	if cErr != nil {
@@ -101,11 +84,7 @@ func (s HTTPServer) RememberCipherLogin(w http.ResponseWriter, r *http.Request) 
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}
-	_, err := auth.GetIDFromToken(r.Context())
-	if err != nil {
-		httperr.RespondWithSlugError(err, w, r)
-		return
-	}
+
 	cmd := command.RememberCipherLoginData{
 		Login:    rememberCipher.Login,
 		Password: rememberCipher.Password,
@@ -168,4 +147,24 @@ func HandlerFromMuxWithJWT(si ServerInterface, r chi.Router, tokenCfg auth.JWTTo
 			jwtauth.Verifier(tokenCfg.GetAuthToken()),
 		},
 	})
+}
+
+// SignIn defines model for SignIn.
+type SignIn struct {
+	Login    string `json:"login"`
+	Password string `json:"password"`
+}
+
+// SignUp defines model for SignUp.
+type SignUp struct {
+	Firstname string `json:"firstname"`
+	Lastname  string `json:"lastname"`
+	Login     string `json:"login"`
+	Password  string `json:"password"`
+}
+
+// Token defines model for Token.
+type Token struct {
+	ExpiresAt string `json:"expires_at"`
+	Token     string `json:"token"`
 }

@@ -31,3 +31,15 @@ func NewRememberCipherCustomData(key, value, meta string) (*RememberCipherCustom
 		meta:  meta,
 	}, nil
 }
+
+func (c *RememberCipherCustomData) GetKey() string {
+	return c.key
+}
+
+func (c *RememberCipherCustomData) GetValue() string {
+	return c.value
+}
+
+func (c *RememberCipherCustomData) GetMeta() string {
+	return c.meta
+}

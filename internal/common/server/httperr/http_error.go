@@ -1,6 +1,7 @@
 package httperr
 
 import (
+	"encoding/json"
 	"github.com/Archetarcher/gophkeeper/internal/common/errors"
 	"net/http"
 
@@ -53,4 +54,13 @@ type ErrorResponse struct {
 func (e ErrorResponse) Render(w http.ResponseWriter, r *http.Request) error {
 	w.WriteHeader(e.httpStatus)
 	return nil
+}
+
+func ParseErrorResponseMessage(body []byte) string {
+	var errResp ErrorResponse
+	err := json.Unmarshal(body, &errResp)
+	if err != nil {
+		return ""
+	}
+	return errResp.Message
 }

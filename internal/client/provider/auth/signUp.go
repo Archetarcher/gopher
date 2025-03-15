@@ -38,3 +38,16 @@ func NewSignUp(login, password, firstname, lastname string) (*SignUp, error) {
 		firstname: firstname,
 	}, nil
 }
+
+func (s *SignUp) GetLogin() string {
+	return s.login
+}
+func (s *SignUp) GetPassword() string {
+	return s.password
+}
+func (s *SignUp) GetFirstname() string {
+	return s.firstname
+}
+func (s *SignUp) GetLastname() string {
+	return s.lastname
+}

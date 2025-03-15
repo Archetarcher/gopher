@@ -6,6 +6,8 @@ import (
 	"github.com/Archetarcher/gophkeeper/internal/common/server"
 	"github.com/Archetarcher/gophkeeper/internal/vault/api"
 	"github.com/Archetarcher/gophkeeper/internal/vault/service"
+	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/jwtauth/v5"
 	"github.com/joho/godotenv"
 	"log"
 	"net/http"
@@ -27,7 +29,19 @@ func main() {
 
 	serverConfig := &server.Config{Session: &server.Session{}}
 
+	s := api.NewHTTPServer(app, serverConfig)
+	rootRouter := chi.NewRouter()
+	rootRouter.Post("/session", s.StartSession)
+
 	server.RunHTTPServerOnAddrWithMiddlewares(":"+os.Getenv("VAULT_PORT"), func(router chi.Router) http.Handler {
-		return api.HandlerFromMux(api.NewHTTPServer(app, serverConfig), router)
-	}, serverConfig, jwtTokenCfg)
+		return api.HandlerFromMux(s, router)
+	}, rootRouter,
+		jwtauth.Verifier(jwtTokenCfg.GetAuthToken()),
+		jwtauth.Authenticator(jwtTokenCfg.GetAuthToken()),
+		func(handler http.Handler) http.Handler {
+			return server.RequestDecryptMiddleware(handler, serverConfig)
+		},
+		server.GzipMiddleware,
+		middleware.DefaultLogger,
+	)
 }

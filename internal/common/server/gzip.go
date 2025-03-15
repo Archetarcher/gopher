@@ -2,6 +2,7 @@ package server
 
 import (
 	"compress/gzip"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -77,7 +78,10 @@ func (c *compressReader) Close() error {
 
 // GzipMiddleware encodes and decodes body according to gzip encryption.
 func GzipMiddleware(next http.Handler) http.Handler {
+
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Println("compression mw called")
+
 		ow := rw
 
 		acceptEncoding := r.Header.Get("Accept-Encoding")
@@ -100,12 +104,14 @@ func GzipMiddleware(next http.Handler) http.Handler {
 		if sendsGzip {
 			cr, err := newCompressReader(r.Body)
 			if err != nil {
-				logrus.Error("failed to create reader", err)
+				logrus.Error("failed to create reader ", err)
 
 				rw.WriteHeader(http.StatusInternalServerError)
 
 				return
 			}
+			fmt.Println("decompressed request body")
+			fmt.Println(cr)
 			r.Body = cr
 
 			defer func() {

@@ -1,7 +1,11 @@
 package api
 
 import (
+	b64 "encoding/base64"
+	"encoding/json"
+	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/common/auth"
+	"github.com/Archetarcher/gophkeeper/internal/common/encryption"
 	"github.com/Archetarcher/gophkeeper/internal/common/server"
 	"github.com/Archetarcher/gophkeeper/internal/common/server/httperr"
 	"github.com/Archetarcher/gophkeeper/internal/vault/app"
@@ -9,6 +13,7 @@ import (
 	"github.com/Archetarcher/gophkeeper/internal/vault/app/query"
 	"github.com/go-chi/render"
 	"net/http"
+	"os"
 )
 
 type HTTPServer struct {
@@ -19,9 +24,35 @@ type HTTPServer struct {
 func NewHTTPServer(app app.Application, config *server.Config) HTTPServer {
 	return HTTPServer{app: app, config: config}
 }
+func (s HTTPServer) StartSession(w http.ResponseWriter, r *http.Request) {
+	startSession := StartSession{}
+	if err := json.NewDecoder(r.Body).Decode(&startSession); err != nil {
+		httperr.BadRequest("invalid-request", err, w, r)
+		return
+	}
+	sDec, err := b64.StdEncoding.DecodeString(startSession.Key)
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
+	key, err := encryption.NewAsymmetric(os.Getenv("PUBLIC_KEY_PATH"), os.Getenv("PRIVATE_KEY_PATH")).Decrypt(sDec)
+	if err != nil {
+		httperr.RespondWithSlugError(err, w, r)
+		return
+	}
+	fmt.Println(string(key))
+	s.config.Session.Key = string(key)
+	w.WriteHeader(http.StatusOK)
+}
+
+// StartSession defines model for StartSession.
+type StartSession struct {
+	Key string `json:"key"`
+}
+
 func (s HTTPServer) RememberCipherLoginData(w http.ResponseWriter, r *http.Request) {
 	rememberCipher := RememberCipherLoginData{}
-	if err := render.Decode(r, &rememberCipher); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&rememberCipher); err != nil {
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}
@@ -47,7 +78,7 @@ func (s HTTPServer) RememberCipherLoginData(w http.ResponseWriter, r *http.Reque
 }
 func (s HTTPServer) RememberCipherCustomData(w http.ResponseWriter, r *http.Request) {
 	rememberCipher := RememberCipherCustomData{}
-	if err := render.Decode(r, &rememberCipher); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&rememberCipher); err != nil {
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}
@@ -72,7 +103,7 @@ func (s HTTPServer) RememberCipherCustomData(w http.ResponseWriter, r *http.Requ
 }
 func (s HTTPServer) RememberCipherCustomBinaryData(w http.ResponseWriter, r *http.Request) {
 	rememberCipher := RememberCipherCustomBinaryData{}
-	if err := render.Decode(r, &rememberCipher); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&rememberCipher); err != nil {
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}
@@ -97,7 +128,7 @@ func (s HTTPServer) RememberCipherCustomBinaryData(w http.ResponseWriter, r *htt
 }
 func (s HTTPServer) RememberCipherCardData(w http.ResponseWriter, r *http.Request) {
 	rememberCipher := RememberCipherCardData{}
-	if err := render.Decode(r, &rememberCipher); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&rememberCipher); err != nil {
 		httperr.BadRequest("invalid-request", err, w, r)
 		return
 	}

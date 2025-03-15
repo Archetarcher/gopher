@@ -87,50 +87,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
 
-  /users/sign-up:
-    post:
-      operationId: signUp
-      security: []
-      requestBody:
-        description: todo
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignUp'
-      responses:
-        '204':
-          description: auth created
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
-  /users/sign-in:
-    post:
-      operationId: signIn
-      security: []
-      requestBody:
-        description: todo
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/SignIn'
-      responses:
-        '200':
-          description: authorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Token'
-        default:
-          description: unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+
 components:
   schemas:
     RememberCipherCard:
@@ -139,8 +96,8 @@ components:
         - cardHolderName
         - brand
         - number
-        - expMonth
-        - expYear
+        - expirationMonth
+        - expirationYear
         - code
       properties:
         cardHolderName:
@@ -149,13 +106,11 @@ components:
           type: string
         number:
           type: string
-        expMonth:
+        expirationMonth:
           type: string
-        expYear:
+        expirationYear:
           type: string
         code:
-          type: string
-        meta:
           type: string
     RememberCipherCustomBinary:
       type: object
@@ -167,8 +122,6 @@ components:
           type: string
         value:
           type: string
-        meta:
-          type: string
     RememberCipherCustom:
       type: object
       required:
@@ -178,8 +131,6 @@ components:
         key:
           type: string
         value:
-          type: string
-        meta:
           type: string
     RememberCipherLogin:
       type: object
