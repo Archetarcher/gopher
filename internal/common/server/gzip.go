@@ -2,7 +2,6 @@ package server
 
 import (
 	"compress/gzip"
-	"fmt"
 	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
@@ -80,7 +79,6 @@ func (c *compressReader) Close() error {
 func GzipMiddleware(next http.Handler) http.Handler {
 
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("compression mw called")
 
 		ow := rw
 
@@ -110,8 +108,6 @@ func GzipMiddleware(next http.Handler) http.Handler {
 
 				return
 			}
-			fmt.Println("decompressed request body")
-			fmt.Println(cr)
 			r.Body = cr
 
 			defer func() {

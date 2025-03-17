@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/auth/app"
 	"github.com/Archetarcher/gophkeeper/internal/auth/app/command"
 	"github.com/Archetarcher/gophkeeper/internal/auth/app/query"
@@ -29,8 +28,6 @@ func (s HTTPServer) SignUp(w http.ResponseWriter, r *http.Request) {
 		Firstname: signUp.Firstname,
 		Lastname:  signUp.Lastname,
 	})
-	fmt.Println("err")
-	fmt.Println(err)
 	if err != nil {
 		httperr.RespondWithSlugError(err, w, r)
 		return
@@ -47,7 +44,6 @@ func (s HTTPServer) SignIn(w http.ResponseWriter, r *http.Request) {
 		Login:    signIn.Login,
 		Password: signIn.Password,
 	})
-	fmt.Println(token)
 	if err != nil {
 		httperr.RespondWithSlugError(err, w, r)
 		return

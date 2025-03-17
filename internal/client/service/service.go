@@ -79,7 +79,6 @@ func startVaultSession(enc encryption.AsymmetricEncryption, prvConfig *provider.
 	}
 
 	logrus.Info("<<<<<<<<<starting vault session>>>>>>>>>>")
-	fmt.Println(string(key))
 	prvConfig.Session.Key = string(key)
 	return nil
 }

@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/client/provider/auth"
 	"github.com/Archetarcher/gophkeeper/internal/common/provider"
 	"github.com/Archetarcher/gophkeeper/internal/common/server/httperr"
@@ -66,7 +65,6 @@ func (r *Provider) SignUp(ctx context.Context, u *auth.SignUp) error {
 
 	if res.StatusCode() != http.StatusCreated {
 		parsedErr := httperr.ParseErrorResponseMessage(res.Body())
-		fmt.Println(parsedErr)
 		if parsedErr != "" {
 			return errors.Wrap(auth.ErrSignUp, parsedErr)
 		}
@@ -97,7 +95,6 @@ func (r *Provider) SignIn(ctx context.Context, u *auth.SignIn) (*provider.Token,
 		}
 		return nil, errors.Wrap(auth.ErrSignIn, res.String())
 	}
-	fmt.Println(res.String())
 	var token provider.Token
 	err = json.Unmarshal(res.Body(), &token)
 	if err != nil {
@@ -105,7 +102,5 @@ func (r *Provider) SignIn(ctx context.Context, u *auth.SignIn) (*provider.Token,
 	}
 	// set bearer token for provider requests
 	r.config.Token = &token
-	fmt.Println("r.config.Token in auth")
-	fmt.Println(r.config.Token)
 	return &token, nil
 }

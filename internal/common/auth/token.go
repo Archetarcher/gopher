@@ -2,7 +2,6 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"github.com/go-chi/jwtauth/v5"
 	jwt2 "github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
@@ -30,14 +29,12 @@ func (t *JWTTokenConfig) CreateToken(id uuid.UUID) (string, error) {
 	claims := jwt2.MapClaims{
 		"id": id,
 	}
-	fmt.Println(t.authToken)
 
 	jwtauth.SetExpiry(claims, time.Now().Add(time.Minute*time.Duration(t.expiresInMinutes)))
 	_, token, err := t.authToken.Encode(claims)
 	if err != nil {
 		return "", err
 	}
-	fmt.Println(token)
 
 	return token, nil
 }
@@ -66,7 +63,6 @@ func GetIDFromToken(requestContext context.Context) (uuid.UUID, error) {
 	if err != nil {
 		return uuid.Nil, err
 	}
-	fmt.Println(claims["id"])
 	userIDFromClaims := uuid.MustParse(claims["id"].(string))
 
 	return userIDFromClaims, nil

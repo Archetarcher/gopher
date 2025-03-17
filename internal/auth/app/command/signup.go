@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/auth/domain/user"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
@@ -26,7 +25,6 @@ func NewSignUpHandler(repo user.Repository) SignUpHandler {
 func (h SignUpHandler) Handle(ctx context.Context, cmd SignUp) error {
 	u, err := h.repo.GetByLogin(ctx, cmd.Login)
 	if u != nil {
-		fmt.Println("starting return error")
 		return user.ErrUserAlreadyRegistered
 	}
 	hash, err := getPasswordHash(cmd.Password)

@@ -22,9 +22,12 @@ func main() {
 		log.Fatalf("err loading: %v", err)
 	}
 
+	// jwt config
 	jwtTokenCfg := auth.GetNewJWTTokenConfig()
+	// new application
 	app := service.NewApplication(ctx, jwtTokenCfg)
 
+	// run application server
 	server.RunHTTPServerOnAddr(":"+os.Getenv("AUTH_PORT"), func(router chi.Router) http.Handler {
 		return api.HandlerFromMux(api.NewHTTPServer(app), router)
 	})

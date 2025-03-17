@@ -3,7 +3,6 @@ package pgx
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/common/db"
 	cipher "github.com/Archetarcher/gophkeeper/internal/vault/domain/cipherLoginData"
 	"github.com/google/uuid"
@@ -66,7 +65,6 @@ func (r *Repository) Get(ctx context.Context, login string) (*cipher.CipherLogin
 	return cipher.UnmarshalCipherLoginDataFromDatabase(c.Id, c.Uri, c.Login, c.Password, c.MetaData, c.UserId, c.CreatedAt, c.UpdatedAt, c.DeletedAt)
 }
 func (r *Repository) Add(ctx context.Context, u *cipher.CipherLoginData) error {
-	fmt.Println(u.GetUserId())
 	_, err := r.db.NamedQueryContext(ctx, createQuery, CipherLoginData{
 		Id:       u.GetId(),
 		UserId:   u.GetUserId(),

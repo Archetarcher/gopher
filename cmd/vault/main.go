@@ -24,15 +24,22 @@ func main() {
 		log.Fatalf("err loading: %v", err)
 	}
 
+	// jwt config
 	jwtTokenCfg := auth.GetNewJWTTokenConfig()
+	// new application
 	app := service.NewApplication(ctx)
 
+	// server side config
 	serverConfig := &server.Config{Session: &server.Session{}}
 
+	// new application server
 	s := api.NewHTTPServer(app, serverConfig)
+
+	// some root routes that exceeds basic middlewares for app
 	rootRouter := chi.NewRouter()
 	rootRouter.Post("/session", s.StartSession)
 
+	// run server
 	server.RunHTTPServerOnAddrWithMiddlewares(":"+os.Getenv("VAULT_PORT"), func(router chi.Router) http.Handler {
 		return api.HandlerFromMux(s, router)
 	}, rootRouter,

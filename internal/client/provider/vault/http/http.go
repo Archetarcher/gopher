@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/client/provider/vault"
 	"github.com/Archetarcher/gophkeeper/internal/common/provider"
 	"github.com/Archetarcher/gophkeeper/internal/common/server/httperr"
@@ -37,8 +36,6 @@ func (r *Provider) RememberCipherLogin(ctx context.Context, c *vault.RememberCip
 	r.Lock()
 	defer r.Unlock()
 
-	fmt.Println("r.config.Token")
-	fmt.Println(r.config.Token)
 	if r.config.Token.IsExpired() {
 		return vault.ErrTokenExpired
 	}
@@ -60,7 +57,6 @@ func (r *Provider) RememberCipherLogin(ctx context.Context, c *vault.RememberCip
 
 	if res.StatusCode() != http.StatusCreated {
 		parsedErr := httperr.ParseErrorResponseMessage(res.Body())
-		fmt.Println(parsedErr)
 		if parsedErr != "" {
 			return errors.Wrap(vault.ErrFailedToRememberCipher, parsedErr)
 		}
@@ -72,7 +68,6 @@ func (r *Provider) RememberCipherCustom(ctx context.Context, c *vault.RememberCi
 	r.Lock()
 	defer r.Unlock()
 
-	fmt.Println(r.config.Token)
 	if r.config.Token.IsExpired() {
 		return vault.ErrTokenExpired
 	}
@@ -93,7 +88,6 @@ func (r *Provider) RememberCipherCustom(ctx context.Context, c *vault.RememberCi
 
 	if res.StatusCode() != http.StatusCreated {
 		parsedErr := httperr.ParseErrorResponseMessage(res.Body())
-		fmt.Println(parsedErr)
 		if parsedErr != "" {
 			return errors.Wrap(vault.ErrFailedToRememberCipher, parsedErr)
 		}
@@ -105,7 +99,6 @@ func (r *Provider) RememberCipherCustomBinary(ctx context.Context, c *vault.Reme
 	r.Lock()
 	defer r.Unlock()
 
-	fmt.Println(r.config.Token)
 	if r.config.Token.IsExpired() {
 		return vault.ErrTokenExpired
 	}
@@ -126,7 +119,6 @@ func (r *Provider) RememberCipherCustomBinary(ctx context.Context, c *vault.Reme
 
 	if res.StatusCode() != http.StatusCreated {
 		parsedErr := httperr.ParseErrorResponseMessage(res.Body())
-		fmt.Println(parsedErr)
 		if parsedErr != "" {
 			return errors.Wrap(vault.ErrFailedToRememberCipher, parsedErr)
 		}
@@ -138,7 +130,6 @@ func (r *Provider) RememberCipherCard(ctx context.Context, c *vault.RememberCiph
 	r.Lock()
 	defer r.Unlock()
 
-	fmt.Println(r.config.Token)
 	if r.config.Token.IsExpired() {
 		return vault.ErrTokenExpired
 	}
@@ -163,7 +154,6 @@ func (r *Provider) RememberCipherCard(ctx context.Context, c *vault.RememberCiph
 
 	if res.StatusCode() != http.StatusCreated {
 		parsedErr := httperr.ParseErrorResponseMessage(res.Body())
-		fmt.Println(parsedErr)
 		if parsedErr != "" {
 			return errors.Wrap(vault.ErrFailedToRememberCipher, parsedErr)
 		}

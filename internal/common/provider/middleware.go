@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
-	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/common/encryption"
 	"github.com/go-resty/resty/v2"
 	"github.com/sirupsen/logrus"
@@ -14,7 +13,6 @@ type MiddlewareFunc func(c *resty.Client, req *resty.Request) error
 
 // GzipAndEncryptMiddleware is a middleware for encrypting data before sending to server.
 func GzipAndEncryptMiddleware(c *resty.Client, req *resty.Request, prvConfig *Config) error {
-	fmt.Println("starting gzip")
 	if req.Header.Get("Content-Encoding") != "gzip" {
 		buf := bytes.NewBuffer(nil)
 		zb := gzip.NewWriter(buf)
@@ -39,8 +37,6 @@ func GzipAndEncryptMiddleware(c *resty.Client, req *resty.Request, prvConfig *Co
 			"Content-Encoding", "gzip")
 
 		//req.SetBody(compressed)
-		fmt.Println("starting encrypting")
-		fmt.Println(prvConfig.Session.Key)
 		symmetricEncryption := encryption.NewSymmetric(prvConfig.Session.Key)
 
 		//encryption
@@ -48,7 +44,6 @@ func GzipAndEncryptMiddleware(c *resty.Client, req *resty.Request, prvConfig *Co
 		if err != nil {
 			logrus.Error(err)
 		}
-		fmt.Println(encrypted)
 		req.SetBody(encrypted)
 	}
 

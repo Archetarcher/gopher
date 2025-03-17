@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	ErrTokenExpired           = errors.New("jwt token is expired")
+	ErrTokenExpired           = errors.New("jwt token is expired, please sign in first")
 	ErrFailedToRememberCipher = errors.New("failed to remember cipher ")
 )
 

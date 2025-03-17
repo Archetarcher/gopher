@@ -3,7 +3,6 @@ package pgx
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/common/db"
 	cipher "github.com/Archetarcher/gophkeeper/internal/vault/domain/cipherCustomBinaryData"
 	"github.com/google/uuid"
@@ -65,9 +64,6 @@ func (r *Repository) Get(ctx context.Context, login string) (*cipher.CipherCusto
 	return cipher.UnmarshalCipherCustomBinaryDataFromDatabase(c.Id, c.Key, c.Value, c.MetaData, c.UserId, c.CreatedAt, c.UpdatedAt, c.DeletedAt)
 }
 func (r *Repository) Add(ctx context.Context, u *cipher.CipherCustomBinaryData) error {
-	fmt.Println(u.GetUserId())
-	fmt.Println(u)
-	fmt.Println(createQuery)
 	_, err := r.db.NamedQueryContext(ctx, createQuery, CipherCustomBinaryData{
 		Id:       u.GetId(),
 		UserId:   u.GetUserId(),

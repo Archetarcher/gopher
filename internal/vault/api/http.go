@@ -3,7 +3,6 @@ package api
 import (
 	b64 "encoding/base64"
 	"encoding/json"
-	"fmt"
 	"github.com/Archetarcher/gophkeeper/internal/common/auth"
 	"github.com/Archetarcher/gophkeeper/internal/common/encryption"
 	"github.com/Archetarcher/gophkeeper/internal/common/server"
@@ -40,7 +39,6 @@ func (s HTTPServer) StartSession(w http.ResponseWriter, r *http.Request) {
 		httperr.RespondWithSlugError(err, w, r)
 		return
 	}
-	fmt.Println(string(key))
 	s.config.Session.Key = string(key)
 	w.WriteHeader(http.StatusOK)
 }
